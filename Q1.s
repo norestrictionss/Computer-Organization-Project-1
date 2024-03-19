@@ -61,7 +61,8 @@ main:
 		li $v0, 5
 		syscall
 	
-	bne $t7, $v0, get_n
+	slt $t2, $v0, $t7
+	bne $t2, $zero, get_n
 	
 	move $t5, $v0
 	addi $s4, $v0, -2 # Assigning target number to be calculated to temporary register
