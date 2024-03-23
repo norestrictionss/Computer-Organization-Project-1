@@ -23,7 +23,7 @@ main:
 		if_not_one:
 			beq $s2, $s3, exit
 			addi $s2, $s2, 1
-			j for_loop
+		j for_loop
 	exit:
 		li $v0, 10
 		syscall
@@ -34,6 +34,7 @@ main:
 		sb $zero, matrix($a0)
 		addi $t7, $a0, -2
 		div $t7, $s1
+
 		
 		mflo $t2 # i
 		mfhi $t4 # j
@@ -69,7 +70,7 @@ main:
 					bne $t3, $zero, fourth_if
 					addi $t5, $a0, -1
 					lb $t5, matrix($t5) # grid[i][j-1]
-					beq $t5, $zero, fourth_if 
+					beq $t5, $zero, fourth_if
 					addi $a0, $a0, -1 #j-=1
 					addi $a1, $a1, 1 # result+1
 					jal dfs
@@ -95,7 +96,7 @@ main:
 		
 
 .data
-    matrix: .byte 5, 6, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0
+   matrix: .byte 5, 6, 0, 0, 0, 1, 1, 1 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0
 	
 	
 	
