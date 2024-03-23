@@ -10,6 +10,7 @@ main:
 	mul $s3, $s0, $s1 # element count
 	li $s5, 0 # temp val
 	li $s6, 0 # island width
+	
 	for_loop:
 		lb $s4, matrix($s2) 
 		bne $s4, $t0, if_not_one
@@ -23,7 +24,7 @@ main:
 		if_not_one:
 			beq $s2, $s3, exit
 			addi $s2, $s2, 1
-		j for_loop
+			j for_loop
 	exit:
 		li $v0, 10
 		syscall
@@ -67,7 +68,7 @@ main:
 				addi $sp, $sp, 8
 			third_if:
 					slt $t3, $t4, $t0 # j<1
-					bne $t3, $zero, fourth_if
+					beq $t3, $t0, fourth_if
 					addi $t5, $a0, -1
 					lb $t5, matrix($t5) # grid[i][j-1]
 					beq $t5, $zero, fourth_if
@@ -79,7 +80,7 @@ main:
 					addi $sp, $sp, 8
 				fourth_if:
 						slt $t3, $t2, $t0 # i<1
-						bne $t3, $zero, end_of_recursive
+						beq $t3, $t0, end_of_recursive
 						sub $t5, $a0, $s1
 						lb $t5, matrix($t5)
 						beq $t5, $zero, end_of_recursive
@@ -96,7 +97,7 @@ main:
 		
 
 .data
-   matrix: .byte 5, 6, 0, 0, 0, 1, 1, 1 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0
+   matrix: .byte 5, 6, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0
 	
 	
 	
