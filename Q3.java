@@ -47,3 +47,23 @@ public class Q3{
     }
 
 }
+/* 
+public static void main(String[] args) {
+    Scanner inp = new Scanner(System.in);
+    String str = inp.nextLine();
+    int num = inp.nextInt();
+    str = modify2(str, 0, str.length() - 1, num);
+    System.out.println(str);
+
+}
+
+public static String modify2(String str1, int begin, int end, int num) {
+   if (num==0){
+       return str1.substring(begin,end+1);
+   }
+    int mid = (begin + end) / 2;
+
+    return modify2(str1, mid + 1, end, num-1) + modify2(str1, begin, mid, num-1);
+    }
+
+*/
