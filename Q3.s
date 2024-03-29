@@ -5,7 +5,7 @@
 
 main:
 
-	addi $t7, $t7, 2
+	
         li $v0, 4
         la $a0, inputText
         syscall
@@ -26,7 +26,7 @@ main:
         la $a0, input # our input
         li $a1, 0 # first index of the string
         move $a2, $v1 # last index of the string 
-        addi $a3, $a3, 1
+        addi $a3, $a3, -1
        
         addi $t0, $a2, 1
         srl $t0, $t0, 1
@@ -55,8 +55,6 @@ substring:
 	addi $a0, $a0, 1
 	j substring
 	exit:
-
-         syscall
 	   jr $ra
         
 strlen:
@@ -78,7 +76,7 @@ modify:
 	sw $a3, 16($sp) # Second input
 	sw $t0, 20($sp)
 	
-	bne $a3, $t7, continue
+	bne $a3, $zero, continue
 	
 	move $t2, $zero
 	jal substring
