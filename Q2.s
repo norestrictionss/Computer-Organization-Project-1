@@ -48,16 +48,19 @@ main:
 	# move $a3, $v0
 	
 	addi $t4, $t4, 400
+	sw $a1, second_elements($t4)
+	addi $t3, $t3, 4
 	jal iterate_list
 	
 	move $s0, $zero
 	addi $s0, $s0, 400
+	
 	li $v0, 4
 	la $a0, second_string
 	syscall
 	
-	
 	print_result:
+		
 		li $v0, 1
 		lw $a0, second_elements($s0)
 		syscall
@@ -65,7 +68,6 @@ main:
 		li $v0, 4
 		la $a0, blank
 		syscall
-
 		beq $s0, $t4, end_of_program
 		addi $s0, $s0, 4
 		j print_result
@@ -89,20 +91,18 @@ read_inputs:
 		
 # It aims to find the least common factor.
 iterate_list:
-	addi $sp, $sp, -20
+	addi $sp, $sp, -16
 	sw $ra, 0($sp)
 	sw $a1, 4($sp) # First number(bigger one)
 	sw $a2, 8($sp) # Second number(smaller one)
 	
+
 	sw $t4, 12($sp)
-	sw $t3, 16($sp)
 	jal scan_second_array
 	lw $ra, 0($sp)
-	lw $a1, 4($sp)
-	lw $a2, 8($sp)
+	lw $a1, 4($sp) # First number(bigger one)
+	lw $a2, 8($sp) # Second number(smaller one)
 	lw $t4, 12($sp)
-	lw $t3, 16($sp)
-	addi $sp, $sp, 8
 	
 	jal find_gcd
 	lw $ra, 0($sp)
@@ -112,19 +112,23 @@ iterate_list:
 	move $a3, $v0 # GCD of two numbers
 	move $t1, $a3 # $t1 holds the GCD value of both a1 and a2.
 	
-	beq $a0, $t6, end
 	jal find_lcf
 	lw $ra, 0($sp)
 	# $t4 stamds for the second array's current index
 	# $t3 stands for the actual array's current index
 	move $a3, $v0 # LCF of two numbers
+	
+	# In the case numbers are not coprime, operations below occurs.
 	beq $t1, $t7, if_not_coprime
-	sw $a3, second_elements($t4) 
-	move $a1, $a3
-	addi $t3, $t3, 4
+	sw $a3, second_elements($t4) # Value achieved by LCF operation is substituted at second_element array.
+	move $a1, $a3 # For the next iteration, $a3(lcf) is assigned to a1.
+	addi $t3, $t3, 4  
 	lw $a2, elements($t3)
 	slt $t5, $a1, $a2
-	addi $t6, $t6, 1 
+	addi $t6, $t6, 2 # It is incremented by two at first. Because, it determines the index. To compare this with length of array, I incremented by 2.
+	# After comparison, I decreased by 1.
+	beq $a0, $t6, end
+	addi $t6, $t6, -1 
 	beq $t5, $zero, iterate_list
 	move $t5, $a2
 	move $a2, $a1
@@ -133,16 +137,21 @@ iterate_list:
 	if_not_coprime:
 		addi $t4, $t4, 4
 		addi $sp, $sp, -4
-		sw $t7, 0($sp)
-		lw $t7, elements($t3)
-		sw $t7, second_elements($t4)
+		sw $t7, 0($sp) # I have done this because $t7 actually hold 1. So, after completing the operations below, I fetched the $t7 value back from sp.
+		lw $t7, elements($t3) # Fetching the element from the actual eleement list
+		sw $t7, second_elements($t4) # Then, replace the zero in the second array with the $t7 value.
 		lw $t7, 0($sp)
 		addi $sp, $sp, 4
+		
+		# Adjusting the arguments for the next iteration
 		lw $a1, elements($t3)
 		addi $t3, $t3, 4
 		lw $a2, elements($t3)
 		slt $t5, $a1, $a2
-		addi $t6, $t6, 1 
+		
+		addi $t6, $t6, 2
+		beq $a0, $t6, end
+		addi $t6, $t6, -1
 		beq $t5, $zero, iterate_list
 		move $t5, $a2
 		move $a2, $a1
@@ -153,6 +162,14 @@ iterate_list:
 	    jr $ra
 
 scan_second_array:
+	
+	
+	addi $t4, $t4, -400
+	bne $t4, $zero, more_than_two
+	addi $t4, $t4, 400
+	jr $ra
+	more_than_two:
+	addi $t4, $t4, 400
 	lw $a1, second_elements($t4)
 	addi $t4, $t4, -4
 	lw $a2, second_elements($t4)
@@ -166,19 +183,22 @@ scan_second_array:
 	lw $ra, 0($sp)
 	lw $a1, 4($sp)
 	lw $a2, 8($sp)
-	addi $sp, $sp, 12
+	
 	
 	move $a3, $v0
 	bne $a3, $t7, go_on
+	addi $sp, $sp, 12
 	jr $ra
 	go_on:
 		jal find_lcf
 		lw $ra, 0($sp)
+		addi $sp, $sp, 12
 		move $a2, $v0
 		addi $t4, $t4, 4
 		sw $zero, second_elements($t4)
 		addi $t4, $t4, -4
-		lw $a2, second_elements($t4)
+		sw $a2, second_elements($t4)
+		sw $t4, 12($sp)
 		j scan_second_array
 
 # Greatest common divisor calculator
