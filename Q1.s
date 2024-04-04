@@ -67,10 +67,12 @@ main:
 	move $t5, $v0
 	addi $s4, $v0, -2 # Assigning target number to be calculated to temporary register
 	addi $t5, $t5, -1
-	beq $t5, $zero, if_one
+	beq $t5, $zero, if_one # The case when n is prompted 1
 	
 	
 	
+	# Loop
+	# It assigns the new f(x) value to x1 and previous x1 value to x0.
 	
 	calculate:
 		beq $s5, $s4, exit

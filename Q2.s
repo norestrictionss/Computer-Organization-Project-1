@@ -4,7 +4,9 @@
 # To function the program properly, the following instructions must be obeyed.
 # Initially, number of inputs must be entered.
 # Then, each input must be entered one-by-one.
-
+# Approach is settling the elements from first array to the second array and finding the least common factor of two numbers. 
+# If there exists a least common factor of two numbers, that is settled to the second_elements array. Otherwise, the number itself is settled.
+# So, final state of the elements are held in the second _elements array.
 main:
 	
 
@@ -15,7 +17,7 @@ main:
 	
 	li $v0, 5
 	syscall
-	move $s0, $v0 # Number of integers
+	move $s0, $v0 # Number of integers that array will hold
 	
 	move $a0, $v0
 	move $a1, $zero
@@ -58,11 +60,11 @@ main:
 	li $v0, 4
 	la $a0, second_string
 	syscall
-	
+	# Displaying the final second array.
 	print_result:
 		
 		li $v0, 1
-		lw $a0, second_elements($s0)
+		lw $a0, second_elements($s0) # Printing the elements of second_elements array.
 		syscall
 		
 		li $v0, 4
@@ -104,6 +106,8 @@ iterate_list:
 	lw $a2, 8($sp) # Second number(smaller one)
 	lw $t4, 12($sp)
 	
+	
+	
 	jal find_gcd
 	lw $ra, 0($sp)
 	lw $a1, 4($sp)
@@ -124,15 +128,14 @@ iterate_list:
 	move $a1, $a3 # For the next iteration, $a3(lcf) is assigned to a1.
 	addi $t3, $t3, 4  
 	lw $a2, elements($t3)
-	slt $t5, $a1, $a2
+	
 	addi $t6, $t6, 2 # It is incremented by two at first. Because, it determines the index. To compare this with length of array, I incremented by 2.
 	# After comparison, I decreased by 1.
 	beq $a0, $t6, end
 	addi $t6, $t6, -1 
 	beq $t5, $zero, iterate_list
-	move $t5, $a2
-	move $a2, $a1
-	move $a1, $t5
+	
+	
 	j iterate_list
 	if_not_coprime:
 		addi $t4, $t4, 4
@@ -144,32 +147,36 @@ iterate_list:
 		addi $sp, $sp, 4
 		
 		# Adjusting the arguments for the next iteration
-		lw $a1, elements($t3)
+		lw $a1, second_elements($t4)
 		addi $t3, $t3, 4
 		lw $a2, elements($t3)
-		slt $t5, $a1, $a2
+		
 		
 		addi $t6, $t6, 2
 		beq $a0, $t6, end
 		addi $t6, $t6, -1
+		
 		beq $t5, $zero, iterate_list
-		move $t5, $a2
-		move $a2, $a1
-		move $a1, $t5 
+		
+		
 		j iterate_list
 	end:
-	    addi $sp, $sp, 12
+	    jal scan_second_array
+	    lw $ra, 0($sp)
+	    addi $sp, $sp, 16
+
 	    jr $ra
 
+# After settling the elements in second array, each element is traversed back until the beginning of the array.
+# Aim is finding the potential least common factors and rearranging the elements again.
 scan_second_array:
 	
-	
-	addi $t4, $t4, -400
-	bne $t4, $zero, more_than_two
-	addi $t4, $t4, 400
+	addi $t4, $t4, -400 # Decreasing the $t4 register to actually achieve the current posiiton in the second array.
+	bne $t4, $zero, more_than_two # If current position in the second array is two or more, it will jump.
+	addi $t4, $t4, 400 # After the operation, $t4 returns back to it's value.
 	jr $ra
 	more_than_two:
-	addi $t4, $t4, 400
+	addi $t4, $t4, 400 # Value is increased back
 	lw $a1, second_elements($t4)
 	addi $t4, $t4, -4
 	lw $a2, second_elements($t4)
@@ -186,19 +193,23 @@ scan_second_array:
 	
 	
 	move $a3, $v0
-	bne $a3, $t7, go_on
+	bne $a3, $t7, go_on # If gcd is not 1, it will jump to go_on
 	addi $sp, $sp, 12
+	addi $t4, $t4, 4
 	jr $ra
 	go_on:
 		jal find_lcf
 		lw $ra, 0($sp)
 		addi $sp, $sp, 12
 		move $a2, $v0
-		addi $t4, $t4, 4
-		sw $zero, second_elements($t4)
+		addi $t4, $t4, 4 # It was reduced 4 in the previous lines. So, I increased it back by 4.
+		sw $zero, second_elements($t4) # Because there exists a lcf, last element is discarded.
+		# And the least common factor will be settled to the previous position in the second array.
 		addi $t4, $t4, -4
 		sw $a2, second_elements($t4)
-		sw $t4, 12($sp)
+		sw $t4, 12($sp) # up-to-date $t4 value must be overwritten back to the sp to utilize it in the iterate_list procedure.
+		move $a1, $a2 
+		sw $a1, 4($sp) # New argument is also put back on the stack.
 		j scan_second_array
 
 # Greatest common divisor calculator
